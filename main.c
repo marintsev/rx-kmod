@@ -4,6 +4,7 @@
 #include <linux/blkdev.h> // block_device_operations
 #include <linux/genhd.h>  // gendisk
 #include <linux/fs.h>     // register_blkdev, unregister_blkdev
+#include <linux/hdreg.h>  // HDIO_GETGEO
 
 MODULE_LICENSE("Dual BSD/GPL");
 
@@ -26,7 +27,21 @@ int wiki_release( struct gendisk * gd, fmode_t mode )
 
 int wiki_ioctl( struct block_device * dev, fmode_t mode, unsigned int cmd, unsigned long arg )
 {
-	return 0;
+	struct hd_geometry geo;
+
+	switch( cmd )
+	{
+		case HDIO_GETGEO:
+			geo.cylinders=1;
+			geo.heads=1;
+			geo.sectors=8;
+			geo.start=1;
+			if( copy_to_user( (void __user *) arg, &geo, sizeof( geo ) ) )
+				return -EFAULT;
+			return 0;
+	}
+
+	return -ENOTTY;
 }
 
 int wiki_media_changed( struct gendisk * gd )
