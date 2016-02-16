@@ -12,16 +12,20 @@ clean:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) clean
 
 mkdev:
-	sudo mknod wikipedia b 252 0
+	sudo mknod wikipedia b 123 0
 	sudo chmod 666 wikipedia
 
 rmdev:
 	sudo rm wikipedia
 
-ins:
-	sudo insmod main.ko
+insmod:
+	sudo insmod main.ko major_number=123
 
-rmm:
+rmmod:
 	sudo rmmod main.ko
+	
+reload:
+	-@sudo rmmod main.ko
+	-@sudo insmod main.ko
 
 endif
